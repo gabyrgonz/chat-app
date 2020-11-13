@@ -1,0 +1,236 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Socket.IO chat</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+  <div class="container-fluid rowItem">
+    
+    <div class="main">
+      <!-- Conversation container -->
+      <div class="header">
+        <h3 id="displayName"></h3>
+      </div>
+      <!-- Message history  -->
+      <div id="messages" class="scroll"></div>
+
+      <!-- Input field -->
+      <form id="form" action="">
+        <div class="input-field">
+          <span>
+            <input id="input-m" autocomplete="off" type="text" class="form-control form-control">
+          </span>
+          <span class="input-field">
+            <button class="send-button send-button-primary">➜</button>
+          </span>
+        </div>
+      </form>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="header">
+        <h3>🟢 Online users</h3>
+      </div>
+      <!-- Active user list -->
+      <div id="activeUserList">
+        <span id="userColorIcon", class=""></span>
+        <span id="userList", class=""></span>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+  <script>
+    $(function () {
+      let socket = io();
+      let username = "n/a";
+      let userId = "uid";
+      let chatHistory = [];
+      let usernames = {};
+      let usercolors = {};
+      let currentOnline = {};
+
+
+      // Update chat and user list
+      function update() {
+        // Update user list
+        $('#userColorIcon').empty();
+        $('#userList').empty();
+        for (user in usernames) {
+          let temp = usernames[user];
+          $('#activeUserList').append($("<div>"))
+          $('#userList').append($("<div>").text(temp)
+            .css('color', user in currentOnline ? usercolors[user] : "grey")
+            .css('text-align', 'center')
+            .css('font-weight', "bold")
+            );
+        }
+
+        // Update chat history
+        $('#messages').empty();
+        for (let i = 0; i < chatHistory.length; i++) {
+          $('#messages').append(getMsg(chatHistory[i]));
+          $("#messages").scrollTop($("#messages")[0].scrollHeight);
+        }
+      }
+
+
+      // Get message and add styling to it
+      function getMsg(data) {
+        let message = data.msg;
+        let userDisplay = '✨ ' + usernames[data.user];
+        let outer = $('<div>');
+        let inner = $('<div>');
+        inner.append($("<p>").text(userDisplay).addClass("timestamp")
+          .css('color', '#29292b')
+          .css('font-weight', 'bold')
+        );
+
+        inner.append($("<div>").text(message)
+          .css('background-color', usercolors[data.user])
+          .css('color', 'white')
+          .css('font-weight', 'semi-bold')
+          .addClass('round')
+          .addClass('chatMsg')
+        );
+        inner.append($('<p>').text(data.time).addClass("timestamp"));
+        if (data.user == userId) {
+          inner.find("p").css('float', 'right');
+          outer.css('justify-content', 'flex-end');
+          outer.css('display', 'flex');
+        }
+        return outer.append(inner);
+      }
+
+
+      // Update users color
+      function requestColorChange (message) {
+        if (message.startsWith("/color")) {
+          let newColor = message.split(' ')[1];
+          socket.emit('change color', { userId: userId, color: newColor });
+          console.log(newColor);
+          return true;
+        }
+        return;
+      }
+
+
+      // Update username
+      function requestNameChange (message) {
+        if (message.startsWith("/name")) {
+          let newName = message.split(' ')[1];
+          socket.emit('change name', { userId: userId, name: newName });
+          console.log(newName);
+          return true;
+        }
+        return;
+      }
+
+
+      // Change text to emoji if allowed
+      function requestEmojiChange(message) {
+        let emoji = message;
+        emoji = emoji.replace(":)", "😁");
+        emoji = emoji.replace(":(", "🙁");
+        emoji = emoji.replace(":o", "😲");
+        emoji = emoji.replace("<3", "💖");
+
+        return emoji;
+      }
+
+
+      // Sending message
+      $('form').submit(function (e) {
+        e.preventDefault();
+
+        var messageText = $('#input-m').val();
+        $('#input-m').val('');
+
+        // check if user color wants to be changed
+        if (requestColorChange(messageText)) {
+          return;
+        }
+
+        // check if username wants to be changed
+        if (requestNameChange(messageText)) {
+          return;
+        }
+        
+        // replace specified text to emoji if allowed
+        messageText = requestEmojiChange(messageText);
+
+        // update the data if it's been changed
+        let data = {
+          message: messageText,
+          userId: userId,
+        }
+
+        // Emit new data
+        socket.emit('chat message', data);
+        return false;
+      });
+
+      // Determine if a key was pressed
+      $("#input-m").keypress(function () {
+        var messageText = $('#input-m').val();
+        messageText = requestEmojiChange(messageText);
+        $('#input-m').val(messageText);
+      });
+
+
+      // Display users name in header
+      socket.on('username', function (object) {
+        userId = object.id;
+        username = object.username;
+        document.cookie = "userId=" + object.id;
+        $('#displayName').empty();
+        $('#displayName').append('👋 ' + username);
+      });
+
+
+      // Update the current user list
+      socket.on('currentUsers', function (list) {
+        currentOnline = list;
+        console.log(currentOnline);
+        update();
+      });
+
+      
+      // Update chat history
+      socket.on('history', function (history) {
+        chatHistory = history;
+        update();
+      });
+
+
+      // Update usernames list
+      socket.on('allUsers', function (list) {
+        usernames = list;
+        update();
+      });
+
+
+      // Update user colors
+      socket.on('allUserColors', function (list) {
+        usercolors = list;
+        update();
+      });
+
+      socket.on('chat message', function (payload) {
+        chatHistory.push(payload);
+        $('#messages').append(getMsg(payload));
+        $("#messages").scrollTop($("#messages")[0].scrollHeight);
+      });
+    });
+  </script>
+</body>
+
+</html>

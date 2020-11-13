@@ -1,0 +1,186 @@
+@media screen and (max-width: 700px) {
+  .main {
+    flex: 70%;
+  }
+
+  .rowItem, .navbar {   
+    flex-direction: column;
+  }
+
+  .scroll {
+    max-height: 50vh;
+  }
+
+  .sidebar {
+    flex: 30%;
+  }
+  
+  .send-button {
+    width: 8vw;
+  }
+
+  #input-m {
+    width: 85vw;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  font-weight: 300;
+}
+
+.main {
+  flex: 70%;
+  background-color: #ffffff;
+  padding: 0px;
+}
+
+body {
+  margin: 0;
+  font-family: Helvetica, sans-serif;
+}
+
+.dot {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+form {
+  padding: 8px;
+  padding-bottom: 6px;
+  position: fixed;
+  width: 80vw;
+  bottom: 0px;
+} 
+
+.activeUserList {
+  width: 100px;
+}
+
+.input-field {
+  width: auto;
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  color: #000000;
+}
+
+#input-m {
+  width: 73vw;  
+  overflow-x: auto;
+  overflow-y: hidden;
+
+}
+
+.chatMsg {
+  padding: 5px 15px;
+  clear: both;
+  width: max-content;
+  display: block;
+  margin-top: 10px;
+  word-wrap: break-word;
+  background-color: #000000;
+  height: auto;
+  position: relative;
+  max-width: 600px;
+}
+
+.scroll {
+  overflow: auto;
+  max-height: 80vh;
+  padding: 0px;
+  background: #ffffff;
+  flex-grow: 1;
+}
+
+.send-button {
+  border-radius: 20px;
+  width: 4vw;
+  min-width: fit-content;
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #20acb6;
+  margin-left: 10px;
+  display: block;
+}
+
+.round {
+  border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+}
+
+.timestamp {
+  color: rgb(66, 65, 65);
+  padding: 0px 10px;
+}
+
+.header {
+  padding: 10px;
+  text-align: center;
+  background: #24c9d4;
+  color: #ffffff;
+}
+
+#form {
+  background: #24c9d4;
+  opacity: 0.4;
+  padding: 10px;
+  color: #ffffff;
+  font-weight: 300;
+  margin-top: 4px;
+}
+
+#messages {
+  list-style-type: none;
+  margin: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#messages li {
+  padding: 5px 10px;
+}
+
+.container-fluid {
+  padding: 0px;
+}
+
+.sidebar {
+  flex: 10%;
+  background-color: #ffffff;
+  border-color: rgb(197, 197, 197);
+  border-style: none none none groove;
+}
+
+
+.rowItem {  
+  padding-inline-end: 0px;
+  flex-wrap: wrap;
+  display: flex;
+  margin: 0px;
+  max-width: 100vw;
+  height: 100vh;
+}
+
+.userColorIcon {
+  width: 100%;
+}
+
+#userList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 5px;
+}
+
+.userListItem {
+  display: inline-block;
+  padding: 15px;
+  color: #ffffff;
+  font-weight: bold;
+}
