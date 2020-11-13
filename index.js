@@ -1,3 +1,7 @@
+// References
+// Used this tutorial: https://youtu.be/jD7FnbI76Hg
+// Used this article: https://medium.com/daily-programmer/build-a-chat-application-with-express-and-socket-io-e8c335d27386 
+
 var express = require('express');
 var app = require('express')();
 var path = require('path');

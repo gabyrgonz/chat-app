@@ -104,6 +104,7 @@
         inner.append($('<p>').text(data.time).addClass("timestamp"));
         if (data.user == userId) {
           inner.find("p").css('float', 'right');
+          inner.find("p").css('font-weight', 'bold')
           outer.css('justify-content', 'flex-end');
           outer.css('display', 'flex');
         }
